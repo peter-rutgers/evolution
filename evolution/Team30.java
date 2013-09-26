@@ -15,7 +15,8 @@ public class Team30 implements ContestSubmission
 		System.out.printf("Creating a new world\n");
 		for(int i = 0; i < populationSize; i++){
 			//individual genereert de random data
-			population.add(new Individual(true));
+			population.add(new Individual());
+			population.get(i).initialize();
 		}
 		System.out.printf("The world is ready for bucking\n");
 	}
