@@ -5,8 +5,12 @@ class Individual {
 	double mutationParameter = 0.05; //aanpasbaar
 	int numDimensions = 10;
 
-	public Individual () {
+	public Individual (boolean b) {
 		values = double[numDimensions];
+	}
+	
+	public void initialize(){
+		//intialiseer de values met random getallen
 	}
 
 	public Individual createOffspring (Individual i) {
