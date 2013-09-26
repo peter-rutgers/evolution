@@ -8,6 +8,17 @@ public class Team30 implements ContestSubmission
 {
 	Random rnd_;
 	ContestEvaluation evaluation_;
+	ArrayList<Individual> population = new ArrayList<Individual>;
+	int populationSize = 150;
+
+	public void initPopulation(){
+		System.out.printf("Creating a new world\n");
+		for(int i = 0; i < populationSize; i++){
+			//individual genereert de random data
+			population.add(new Individual(true));
+		}
+		System.out.printf("The world is ready for bucking\n");
+	}
 	
 	public SubmissionTemplate()
 	{
@@ -36,6 +47,8 @@ public class Team30 implements ContestSubmission
 	public void run()
 	{
 		// Run your algorithm here
+		// Maak de populatie aan.
+		initPopulation();
 
 		// Getting data from evaluation problem (depends on the specific evaluation implementation)
 		// E.g. getting a vector of numbers
