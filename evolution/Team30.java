@@ -1,6 +1,7 @@
 import org.vu.contest.ContestSubmission;
 import org.vu.contest.ContestEvaluation;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Properties;
 
@@ -8,20 +9,15 @@ public class Team30 implements ContestSubmission
 {
 	Random rnd_;
 	ContestEvaluation evaluation_;
-	ArrayList<Individual> population = new ArrayList<Individual>;
+	Population population;
 	int populationSize = 150;
+	int numSurvivors = 30;
 
 	public void initPopulation(){
-		System.out.printf("Creating a new world\n");
-		for(int i = 0; i < populationSize; i++){
-			//individual genereert de random data
-			population.add(new Individual());
-			population.get(i).initialize();
-		}
-		System.out.printf("The world is ready for bucking\n");
+		
 	}
 	
-	public SubmissionTemplate()
+	public void SubmissionTemplate()
 	{
 		rnd_ = new Random();
 	}
@@ -45,12 +41,26 @@ public class Team30 implements ContestSubmission
 		// Do sth with property values, e.g. specify relevant settings of your algorithm
 	}
 	
+	private Population getSurvivors(Population p, int numSurvivors){
+		Population result = new Population();
+		p.sort();
+		for(int i = 0; i<numSurvivors; i++){
+			result.add(p.get(i));
+		}
+		return result;
+	}
+	
 	public void run()
 	{
 		// Run your algorithm here
 		// Maak de populatie aan.
-		initPopulation();
-
+		population = new Population(populationSize);
+		/**
+		Micha: Hier crossover/mutate doen, evaluaten en daarna de survivors uitkiezen.
+		
+		**/
+		
+		population = getSurvivors(population, numSurvivors);
 		// Getting data from evaluation problem (depends on the specific evaluation implementation)
 		// E.g. getting a vector of numbers
 		// Vector<Double> data = (Vector<Doulbe>)evaluation_.getData("trainingset1");
