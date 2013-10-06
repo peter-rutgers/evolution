@@ -5,7 +5,7 @@ class Individual {
 	double evaluationScore;
 
 	Random rnd;
-	double mutationParameter = 0.05; //aanpasbaar
+	double mutationParameter = 1; //aanpasbaar
 	double mutation_stddev = 0.5; //voor mutaties uit normale verdeling (pag. 44)
     double msize_decrease_factor = 0.98; // bij mutate_decreasing
 	double crossoverParameter = 0.05; //aanpasbaar
@@ -15,12 +15,16 @@ class Individual {
     double max_mutation_size = maxValue - minValue; // bij mutate_decreasing
     
 	public Individual () {
-		double[] values = new double[numDimensions];
+		values = new double[numDimensions];
 		rnd = new Random();
+		initialize();
 	}
 	
 	public void initialize(){
 		//intialiseer de values met random getallen
+		for (int i = 0; i < numDimensions; i++) {
+			values[i] = Math.random() * (maxValue - minValue) + minValue;
+		}
 	}
 	
 	public void initialize(int i){
@@ -28,23 +32,24 @@ class Individual {
 	}
 
 	public Individual createOffspring (Individual i) {
-		//child.values = mutate(crossover(i.values));
-		return new Individual();
+		Individual child = new Individual();
+		child.values = mutate(crossover(i.values));
+		return child;
 	}
 
 	private double[] crossover (double[] d) { //one of the parent values
-		int crossoverpoint = randomWithRange(1,8); //bepaald welk stuk van welke ouder
+		int crossoverpoint = randomWithRange(1,numDimensions-1); //bepaald welk stuk van welke ouder
 		double[] child = new double[numDimensions];
-		for(int i = 0; i == crossoverpoint; i++){ 			//ouder 1
+		for(int i = 0; i < crossoverpoint; i++){ 			//ouder 1
 			child[i] = this.values[i];
 		}
-		for(int i = crossoverpoint + 1; i == numDimensions-1; i++){ //ouder 2
+		for(int i = crossoverpoint; i < numDimensions; i++){ //ouder 2
 			child[i] = d[i];
 		}
 		return child;
 	}
 	
-	private int randomWithRange(int min, int max){ 
+	public static int randomWithRange(int min, int max){ 
 		 int range = (max - min) + 1;     
 		 return (int)(Math.random() * range) + min;
 	}
