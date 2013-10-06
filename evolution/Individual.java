@@ -25,11 +25,11 @@ class Individual {
 	private double[] crossover (double[] d) { //one of the parent values
 		int crossoverpoint = randomWithRange(1,9); //bepaald welk stuk van welke ouder
 		double[] child = new double[numDimensions];
-		for(int i=0, i= crossoverpoint, i++){ 			//ouder 1
+		for(int i=0; i== crossoverpoint; i++){ 			//ouder 1
 			child[i] = this.values[i];
 		}
-		for(int i= crossoverpoint + 1, i=numDimensions, i++){ //ouder 2
-			child[i]=d.values[i];
+		for(int i= crossoverpoint + 1; i==numDimensions; i++){ //ouder 2
+			child[i]=d[i];
 		}
 		return child;
 	}
