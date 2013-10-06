@@ -11,6 +11,7 @@ public class Team30 implements ContestSubmission {
 	Population population;
 	int populationSize = 150;
 	int numSurvivors = 30;
+	int iterations;
 
 	public Team30() {
 		rnd_ = new Random();
@@ -41,6 +42,20 @@ public class Team30 implements ContestSubmission {
 
 		// Do sth with property values, e.g. specify relevant settings of your
 		// algorithm
+
+		iterations = (int)Math.floor(Integer.parseInt(props.get("Evaluations").toString()) / populationSize);
+		props.get("Regular");
+		props.get("Multimodal");
+		props.get("Separable");
+	}
+
+	private void doEvaluations(Population p) {
+		for (int i = 0; i < p.size(); i++) {
+			Individual x = p.get(i);
+			x.evaluationScore = (double) evaluation_.evaluate(x.values);
+			//System.out.printf("Evaluated individual %.1f %.1f to %.12f\n", x.values[0], x.values[1], x.evaluationScore);
+		}
+		
 	}
 
 	private Population getSurvivors(Population p, int numSurvivors) {
@@ -49,6 +64,7 @@ public class Team30 implements ContestSubmission {
 		for (int i = 0; i < numSurvivors; i++) {
 			result.add(p.get(i));
 		}
+		System.out.printf("Evaluation range = %.12f %.12f\n", p.get(0).evaluationScore, p.get(numSurvivors-1).evaluationScore);
 		return result;
 	}
 	
@@ -156,6 +172,7 @@ public class Team30 implements ContestSubmission {
 		// Run your algorithm here
 		// Maak de populatie aan.
 		population = new Population(populationSize);
+
 		/**
 		 * Micha: Hier crossover/mutate doen, evaluaten en daarna de survivors
 		 * uitkiezen.
@@ -164,6 +181,24 @@ public class Team30 implements ContestSubmission {
 		population = getSurvivors(population, numSurvivors);
 		// Getting data from evaluation problem (depends on the specific
 		// evaluation implementation)
+		
+		setEvaluation(new Function3()); //tijdelijk, dit hoort opgegeven te worden via user input
+		
+		for (int i = 0; i < iterations; i++) {
+			/**
+			Micha: Hier crossover/mutate doen, evaluaten en daarna de survivors uitkiezen.
+			
+			**/
+			doEvaluations(population);
+			population = getSurvivors(population, numSurvivors);
+			while (population.size() < populationSize) {
+			// voorlopig een random parent selectie gezet om te kunnen runnen -Peter
+				Individual xx = population.get(Individual.randomWithRange(0, numSurvivors - 1));
+				Individual xy = population.get(Individual.randomWithRange(0, numSurvivors - 1));
+				population.add(xx.createOffspring(xy));
+			}
+		}
+		// Getting data from evaluation problem (depends on the specific evaluation implementation)
 		// E.g. getting a vector of numbers
 		// Vector<Double> data =
 		// (Vector<Doulbe>)evaluation_.getData("trainingset1");
@@ -172,5 +207,6 @@ public class Team30 implements ContestSubmission {
 		// E.g. evaluating a series of true/false predictions
 		// boolean pred[] = ...
 		// Double score = (Double)evaluation_.evaluate(pred);
+		System.out.printf("Final result = %.2f", evaluation_.getFinalResult());
 	}
 }
