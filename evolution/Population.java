@@ -39,6 +39,10 @@ public class Population {
 		return result;
 	}
 	
+	public int size(){
+		return population.size();
+	}
+	
   static ArrayList<Individual> bubbleSort(ArrayList<Individual> list){
 	  int count = 0;
 	  for (int outer = 0; outer < list.size() - 1; outer++){
