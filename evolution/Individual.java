@@ -1,8 +1,12 @@
+import java.util.Random;
+
 class Individual {
 	double[] values;
 	double evaluationScore;
 
+	Random rnd;
 	double mutationParameter = 0.05; //aanpasbaar
+	double mutation_stddev = 0.5; //voor mutaties uit normale verdeling (pag. 44)
 	double crossoverParameter = 0.05; //aanpasbaar
 	int numDimensions = 10;
     double minValue = -5;
@@ -10,6 +14,7 @@ class Individual {
     
 	public Individual () {
 		double[] values = new double[numDimensions];
+		rnd = new Random();
 	}
 	
 	public void initialize(){
@@ -106,6 +111,27 @@ class Individual {
         int mutationpoint = randomWithRange(0,numDimensions-1);
         d[mutationpoint] = Math.random() * (maxValue - minValue) + minValue;
         return d;
+    }
+    
+    private double[] mutateNonuniform (double[] d) {
+    	double replacement = 0;
+    	
+    	for (int i = 0; i < numDimensions; i++) {
+    		// Mutate each position using normal distribution
+    		do {
+    			replacement = d[i] + rnd.nextGaussian() * mutation_stddev;
+    		} while (replacement > maxValue || replacement < minValue);
+    		
+    		d[i] = replacement;
+    	}
+    	
+		return d;
+    }
+    
+    private double[] mutateDecreasing (double[] d) {
+		return d;
+    	
+    	
     }
 }
 
