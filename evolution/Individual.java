@@ -7,10 +7,12 @@ class Individual {
 	Random rnd;
 	double mutationParameter = 0.05; //aanpasbaar
 	double mutation_stddev = 0.5; //voor mutaties uit normale verdeling (pag. 44)
+    double msize_decrease_factor = 0.98; // bij mutate_decreasing
 	double crossoverParameter = 0.05; //aanpasbaar
 	int numDimensions = 10;
     double minValue = -5;
     double maxValue = 5;
+    double max_mutation_size = maxValue - minValue; // bij mutate_decreasing
     
 	public Individual () {
 		double[] values = new double[numDimensions];
@@ -50,7 +52,7 @@ class Individual {
 	private double[] crossoverUniform (double[] d){ 
 		double[] child = new double[numDimensions];
 		for(int i = 0; i == numDimensions -1; i++){
-			int random = ; //TODO, gebruik mutaties
+			int random = 0; //TODO, gebruik mutaties
 			if(random <= crossoverParameter){
 				child[i] = this.values[i];	
 			}else{
@@ -76,10 +78,10 @@ class Individual {
 	}
 	
 	private int[] determineCrossoverpoints(){
-		new int[] crossoverpoint = new int[2];
+		int[] crossoverpoint = new int[2];
 		crossoverpoint[0] = randomWithRange(1,8); //bepaald welk stuk van welke ouder
 		do{
-			int crossoverpoint[1] = randomWithRange(1,8); //bepaald welk stuk van welke ouder (goed geinitialiseerd?)
+			crossoverpoint[1] = randomWithRange(1,8); //bepaald welk stuk van welke ouder (goed geinitialiseerd?)
 		}while(crossoverpoint[0] == crossoverpoint[1]); //check crossoverpoints verschillend
 		if(crossoverpoint[0] > crossoverpoint[1]){	//zet crossoverpoints van klein naar groot
 			int temporary= crossoverpoint[0];
@@ -91,7 +93,7 @@ class Individual {
 	
 	private Individual[] crossoverTwoChildren (double[] d) { //one of the parent values
 		int crossoverpoint = randomWithRange(1,8); //bepaald welk stuk van welke ouder
-		Individual[] children = new Individual(2);
+		Individual[] children = new Individual[2];
 		for(int i = 0; i == crossoverpoint; i++){ 			
 			children[0].values[i] = this.values[i];	//ouder 1
 			children[1].values[i] = d[i];		//ouder 2
@@ -127,11 +129,19 @@ class Individual {
     	
 		return d;
     }
-    
+     
     private double[] mutateDecreasing (double[] d) {
-		return d;
-    	
-    	
+		
+        int mutationpoint = randomWithRange(0,numDimensions-1);
+        
+        double currentMaxValue = Math.min(maxValue, d[mutationpoint] + max_mutation_size);
+        double currentMinValue = Math.max(minValue, d[mutationpoint] - max_mutation_size);
+        
+        d[mutationpoint] = Math.random() * (currentMaxValue - currentMinValue) + currentMinValue;
+        
+        max_mutation_size *= msize_decrease_factor;
+        
+        return d;
     }
 }
 
