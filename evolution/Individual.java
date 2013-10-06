@@ -5,7 +5,9 @@ class Individual {
 	double mutationParameter = 0.05; //aanpasbaar
 	double crossoverParameter = 0.05; //aanpasbaar
 	int numDimensions = 10;
-
+    double minValue = -5;
+    double maxValue = 5;
+    
 	public Individual () {
 		double[] values = new double[numDimensions];
 	}
@@ -96,8 +98,15 @@ class Individual {
 		return children;
 	}
 
-	private double[] mutate (double[] d) {	//child values
-		return new double[1];
-	}
 
+    private double[] mutate (double[] d) {    //child values
+        if (Math.random() > mutationParameter) {
+            return d;
+        }
+        int mutationpoint = randomWithRange(0,numDimensions-1);
+        d[mutationpoint] = Math.random() * (maxValue - minValue) + minValue;
+        return d;
+    }
 }
+
+

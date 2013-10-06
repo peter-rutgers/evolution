@@ -13,6 +13,10 @@ public class Team30 implements ContestSubmission
 	int populationSize = 150;
 	int numSurvivors = 30;
 
+	public Team30() {
+		rnd_ = new Random();
+	}
+	
 	public void initPopulation(){
 		
 	}
