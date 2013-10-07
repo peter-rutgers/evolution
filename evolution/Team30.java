@@ -1,7 +1,6 @@
 import org.vu.contest.ContestSubmission;
 import org.vu.contest.ContestEvaluation;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Properties;
 
@@ -64,7 +63,7 @@ public class Team30 implements ContestSubmission {
 		for (int i = 0; i < numSurvivors; i++) {
 			result.add(p.get(i));
 		}
-		System.out.printf("Evaluation range = %.12f %.12f\n", p.get(0).evaluationScore, p.get(numSurvivors-1).evaluationScore);
+		//System.out.printf("Evaluation range = %.12f %.12f\n", p.get(0).evaluationScore, p.get(numSurvivors-1).evaluationScore);
 		return result;
 	}
 	
@@ -182,7 +181,7 @@ public class Team30 implements ContestSubmission {
 		// Getting data from evaluation problem (depends on the specific
 		// evaluation implementation)
 		
-		setEvaluation(new Function3()); //tijdelijk, dit hoort opgegeven te worden via user input
+		//setEvaluation(new Function3()); //tijdelijk, dit hoort opgegeven te worden via user input
 		
 		for (int i = 0; i < iterations; i++) {
 			/**
@@ -207,6 +206,6 @@ public class Team30 implements ContestSubmission {
 		// E.g. evaluating a series of true/false predictions
 		// boolean pred[] = ...
 		// Double score = (Double)evaluation_.evaluate(pred);
-		System.out.printf("Final result = %.2f", evaluation_.getFinalResult());
+		//System.out.printf("Final result = %.2f", evaluation_.getFinalResult());
 	}
 }

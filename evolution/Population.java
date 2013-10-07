@@ -7,7 +7,7 @@ public class Population {
 	//constructors, eerste is om de populatie op te zetten
 	//tweede wordt gebruikt voor nieuwe populaties (overlevenden enzo)
 	public Population(int populationSize){
-		System.out.printf("Creating a new world\n");
+		//System.out.printf("Creating a new world\n");
 		for(int i = 0; i < populationSize; i++){
 			population.add(new Individual());
 			population.get(i).initialize();
@@ -15,7 +15,7 @@ public class Population {
 			// waarom krijgen ze hier al evaluationScore 150 t/m 1 toegewezen? -Peter
 			population.get(i).initialize(populationSize-i); 
 		}
-		System.out.printf("The world is ready for bucking\n");
+		//System.out.printf("The world is ready for bucking\n");
 	}
 	
 	public Population(){
