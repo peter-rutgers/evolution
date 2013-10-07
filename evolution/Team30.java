@@ -51,7 +51,11 @@ public class Team30 implements ContestSubmission {
 	private void doEvaluations(Population p) {
 		for (int i = 0; i < p.size(); i++) {
 			Individual x = p.get(i);
-			x.evaluationScore = (double) evaluation_.evaluate(x.values);
+			try{
+				x.evaluationScore = (double) evaluation_.evaluate(x.values);
+			} catch(Exception e){
+				x.evaluationScore = -100.0;
+			}
 			//System.out.printf("Evaluated individual %.1f %.1f to %.12f\n", x.values[0], x.values[1], x.evaluationScore);
 		}
 		
@@ -86,7 +90,12 @@ public class Team30 implements ContestSubmission {
 			for(int j = 0; j < p.size(); j++){
 				//found the individual who comes after the one which is chosen
 				if(ranking[j] > decision){
-					newP.add(p.get(i-1));
+					if(j == 0){
+						newP.add(p.get(j));
+					}else{
+					newP.add(p.get(j-1));
+					}
+					break;
 				}
 			}
 		}
@@ -102,12 +111,19 @@ public class Team30 implements ContestSubmission {
 		double[] wheel = createWheel(normalizeFitness(p));
 		Population newP = new Population();
 		double decision;
-		for(int i = 0; i < numSurvivors; i++){
+		int i = 0;
+		while(i < numSurvivors){
 			decision = Math.random();
 			for(int j = 0; j < p.size(); j++){
 				//found the individual who comes after the one which is chosen
 				if(wheel[j] > decision){
-					newP.add(p.get(i-1));
+					if(j == 0){
+						newP.add(p.get(j));
+					} else {
+						newP.add(p.get(j-1));
+					}
+					i++;
+					break;
 				}
 			}
 		}
@@ -131,10 +147,17 @@ public class Team30 implements ContestSubmission {
 	//source: http://geneticprogramming.us/Selection.html
 	private Population FitnessProportionalSelection(Population p, int numSurvivors){
 		Population newPop = new Population();
-		double[] normalizedFitness;
-		normalizedFitness = normalizeFitness(p);
+		double[] f;
+		double f2= 0;
+		f = normalizeFitness(p);
+		for (int i = 0; i < f.length/2; i++)
+		  {
+			 f2 = f[1];
+		     f[i] = f[f.length-1 - i];
+		     f[f.length-1 - i] = f2;
+		  }
 		for(int i = 0; i < numSurvivors; i++){
-			newPop.add(selectIndividual(p, normalizedFitness));
+			newPop.add(selectIndividual(p, f));
 		}
 		return newPop;
 	}
@@ -143,15 +166,33 @@ public class Team30 implements ContestSubmission {
 	//get the total fitness value of the population, divide each fitness by this.
 	//this leads to the sum of the fitness to be 1.
 	private double[] normalizeFitness(Population p){
-		double sum = 0;
+		double min = getMin(p);
+		double max = getMax(p);
 		double normalized[] = new double[p.size()];
-		for(int i = 0; i < p.size(); i ++){
-			sum+=p.get(i).evaluationScore;
-		}
 		for(int i = 0; i < p.size(); i++){
-			normalized[i] = p.get(i).evaluationScore/sum;
+			normalized[i] = (p.get(i).evaluationScore-min)/(max-min);
 		}
 		return normalized;
+	}
+	
+	double getMin(Population p){
+		double result = 1000.0;
+		for(int i = 0; i < p.size(); i++){
+			if(p.get(i).evaluationScore < result){
+				result = p.get(i).evaluationScore;
+			}
+		}
+		return result;
+	}
+	
+	double getMax(Population p){
+		double result = -1000.0;
+		for(int i = 0; i < p.size(); i++){
+			if(p.get(i).evaluationScore > result){
+				result = p.get(i).evaluationScore;
+			}
+		}
+		return result;
 	}
 
 	private Individual selectIndividual(Population p,
@@ -177,11 +218,11 @@ public class Team30 implements ContestSubmission {
 		 * uitkiezen.
 		 **/
 
-		population = getSurvivors(population, numSurvivors);
+		population = FitnessProportionalSelection(population, numSurvivors);
 		// Getting data from evaluation problem (depends on the specific
 		// evaluation implementation)
 		
-		//setEvaluation(new Function3()); //tijdelijk, dit hoort opgegeven te worden via user input
+		setEvaluation(new Function1()); //tijdelijk, dit hoort opgegeven te worden via user input
 		
 		for (int i = 0; i < iterations; i++) {
 			/**
@@ -189,13 +230,21 @@ public class Team30 implements ContestSubmission {
 			
 			**/
 			doEvaluations(population);
-			population = getSurvivors(population, numSurvivors);
+			population = FitnessProportionalSelection(population, numSurvivors);
+			//System.out.printf("pop size = %d", population.size());
 			while (population.size() < populationSize) {
 			// voorlopig een random parent selectie gezet om te kunnen runnen -Peter
+				//Individual[] children = new Individual[2];
 				Individual xx = population.get(Individual.randomWithRange(0, numSurvivors - 1));
 				Individual xy = population.get(Individual.randomWithRange(0, numSurvivors - 1));
+				//Individual yz = population.get(Individual.randomWithRange(0, numSurvivors - 1));
+				//population.add(xx.createOffspring(xy, yz));
 				population.add(xx.createOffspring(xy));
+				/*children = xx.multipleChildren(xy);
+				population.add(children[0]);
+				population.add(children[1]);*/
 			}
+			//System.out.printf("iteration number %d out of %d -- pop size is %d\n", i, iterations, population.size());
 		}
 		// Getting data from evaluation problem (depends on the specific evaluation implementation)
 		// E.g. getting a vector of numbers
@@ -206,6 +255,6 @@ public class Team30 implements ContestSubmission {
 		// E.g. evaluating a series of true/false predictions
 		// boolean pred[] = ...
 		// Double score = (Double)evaluation_.evaluate(pred);
-		//System.out.printf("Final result = %.2f", evaluation_.getFinalResult());
+		System.out.printf("Final result = %.2f", evaluation_.getFinalResult());
 	}
 }

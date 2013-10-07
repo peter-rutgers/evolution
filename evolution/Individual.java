@@ -8,7 +8,7 @@ class Individual {
 	double mutationParameter = 1; //aanpasbaar
 	double mutation_stddev = 0.5; //voor mutaties uit normale verdeling (pag. 44)
     double msize_decrease_factor = 0.98; // bij mutate_decreasing
-	double crossoverParameter = 0.05; //aanpasbaar
+	double crossoverParameter = 0.5; //aanpasbaar
 	int numDimensions = 10;
     double minValue = -5;
     double maxValue = 5;
@@ -33,8 +33,21 @@ class Individual {
 
 	public Individual createOffspring (Individual i) {
 		Individual child = new Individual();
-		child.values = mutate(crossover(i.values));
+		child.values = mutateNonuniform(crossoverUniform(i.values));
 		return child;
+	}
+	
+	public Individual createOffspring (Individual i, Individual i2) {
+		Individual child = new Individual();
+		child.values = mutateNonuniform(crossoverThreeParents(i.values, i2.values));
+		return child;
+	}
+	
+	public Individual[] multipleChildren(Individual i){
+		Individual[] c = crossoverTwoChildren(i.values);
+		c[0].values = mutateDecreasing(c[0].values);
+		c[1].values = mutateDecreasing(c[1].values);
+		return c;
 	}
 
 	private double[] crossover (double[] d) { //one of the parent values
@@ -56,8 +69,8 @@ class Individual {
 	
 	private double[] crossoverUniform (double[] d){ 
 		double[] child = new double[numDimensions];
-		for(int i = 0; i == numDimensions -1; i++){
-			int random = 0; //TODO, gebruik mutaties
+		for(int i = 0; i < numDimensions; i++){
+			double random = Math.random(); //TODO, gebruik mutaties
 			if(random <= crossoverParameter){
 				child[i] = this.values[i];	
 			}else{
@@ -70,13 +83,13 @@ class Individual {
 	private double[] crossoverThreeParents(double[] d, double[] e){
 		int[] crossoverpoint = determineCrossoverpoints();
 		double[] child = new double[numDimensions];
-		for(int i = 0; i == crossoverpoint[0]; i++){ 			//ouder 1
+		for(int i = 0; i < crossoverpoint[0]; i++){ 			//ouder 1
 			child[i] = this.values[i];
 		}
-		for(int i = crossoverpoint[0]+1; i == crossoverpoint[1]; i++){	//ouder 2
+		for(int i = crossoverpoint[0]+1; i < crossoverpoint[1]; i++){	//ouder 2
 			child[i]=d[i];
 		}
-		for(int i = crossoverpoint[1] + 1; i == numDimensions-1; i++){ //ouder 3
+		for(int i = crossoverpoint[1] + 1; i < numDimensions; i++){ //ouder 3
 			child[i]=e[i];
 		}
 		return child;
@@ -91,7 +104,7 @@ class Individual {
 		if(crossoverpoint[0] > crossoverpoint[1]){	//zet crossoverpoints van klein naar groot
 			int temporary= crossoverpoint[0];
 			crossoverpoint[0] = crossoverpoint[1];
-			crossoverpoint[2] = temporary;
+			crossoverpoint[1] = temporary;
 		}
 		return crossoverpoint;
 	}
@@ -99,11 +112,13 @@ class Individual {
 	private Individual[] crossoverTwoChildren (double[] d) { //one of the parent values
 		int crossoverpoint = randomWithRange(1,8); //bepaald welk stuk van welke ouder
 		Individual[] children = new Individual[2];
-		for(int i = 0; i == crossoverpoint; i++){ 			
+		children[0] = new Individual();
+		children[1] = new Individual();
+		for(int i = 0; i < crossoverpoint; i++){ 
 			children[0].values[i] = this.values[i];	//ouder 1
 			children[1].values[i] = d[i];		//ouder 2
 		}
-		for(int i = crossoverpoint + 1; i == numDimensions-1; i++){ 
+		for(int i = crossoverpoint; i < numDimensions; i++){ 
 			children[0].values[i] = d[i];		//ouder 2
 			children[1].values[i] = this.values[i]; //ouder 1
 		}
