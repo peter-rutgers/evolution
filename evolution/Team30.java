@@ -11,7 +11,8 @@ public class Team30 implements ContestSubmission {
 	int populationSize = 150;
 	int numSurvivors = 30;
 	int iterations;
-
+	int mode;
+	
 	public Team30() {
 		rnd_ = new Random();
 	}
@@ -27,6 +28,7 @@ public class Team30 implements ContestSubmission {
 	public void setSeed(long seed) {
 		// Set seed of algortihms random process
 		rnd_.setSeed(seed);
+		//rnd_.setSeed((long) (Math.random() * 100000000));
 	}
 
 	public void setEvaluation(ContestEvaluation evaluation) {
@@ -42,10 +44,21 @@ public class Team30 implements ContestSubmission {
 		// Do sth with property values, e.g. specify relevant settings of your
 		// algorithm
 
+
+		if (props.get("Regular").toString().equals("true")) {
+			mode = 2;
+			// mode 2 true true false
+		} else {
+			if (props.get("Multimodal").toString().equals("true")) {
+				mode = 3; // mode 3 false true false
+				populationSize = 1500;
+				numSurvivors = 60;
+			} else {
+				mode = 1; // mode 1 false false true
+			}
+		}
+
 		iterations = (int)Math.floor(Integer.parseInt(props.get("Evaluations").toString()) / populationSize);
-		props.get("Regular");
-		props.get("Multimodal");
-		props.get("Separable");
 	}
 
 	private void doEvaluations(Population p) {
@@ -209,20 +222,21 @@ public class Team30 implements ContestSubmission {
 	}
 
 	public void run() {
+		//setEvaluation(new Function3()); //tijdelijk, dit hoort opgegeven te worden via user input
+				
 		// Run your algorithm here
 		// Maak de populatie aan.
-		population = new Population(populationSize);
+		population = new Population(populationSize, mode);
 
 		/**
 		 * Micha: Hier crossover/mutate doen, evaluaten en daarna de survivors
 		 * uitkiezen.
 		 **/
 
-		population = FitnessProportionalSelection(population, numSurvivors);
+		population = getSurvivors(population, numSurvivors);
 		// Getting data from evaluation problem (depends on the specific
 		// evaluation implementation)
 		
-		setEvaluation(new Function1()); //tijdelijk, dit hoort opgegeven te worden via user input
 		
 		for (int i = 0; i < iterations; i++) {
 			/**
@@ -230,7 +244,7 @@ public class Team30 implements ContestSubmission {
 			
 			**/
 			doEvaluations(population);
-			population = FitnessProportionalSelection(population, numSurvivors);
+			population = getSurvivors(population, numSurvivors);
 			//System.out.printf("pop size = %d", population.size());
 			while (population.size() < populationSize) {
 			// voorlopig een random parent selectie gezet om te kunnen runnen -Peter
@@ -255,6 +269,13 @@ public class Team30 implements ContestSubmission {
 		// E.g. evaluating a series of true/false predictions
 		// boolean pred[] = ...
 		// Double score = (Double)evaluation_.evaluate(pred);
-		System.out.printf("Final result = %.2f", evaluation_.getFinalResult());
+		//System.out.printf("Final result = %.2f\n", evaluation_.getFinalResult());
+		finalresult = evaluation_.getFinalResult();
+	}
+	
+	double finalresult;
+	public double score() {
+		this.run();
+		return finalresult;
 	}
 }

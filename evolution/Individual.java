@@ -5,22 +5,30 @@ class Individual {
 	double evaluationScore;
 
 	Random rnd;
+	int mode;
 	double mutationParameter = 1; //aanpasbaar
-	double mutation_stddev = 0.5; //voor mutaties uit normale verdeling (pag. 44)
-    double msize_decrease_factor = 0.98; // bij mutate_decreasing
+	double mutationParameter2 = 0.3; //voor elk afzonderlijke double
+	double mutation_stddev = 0.15; //voor mutaties uit normale verdeling (pag. 44)
+    double msize_decrease_factor = 1; // bij mutate_decreasing
 	double crossoverParameter = 0.5; //aanpasbaar
 	int numDimensions = 10;
     double minValue = -5;
     double maxValue = 5;
     double max_mutation_size = maxValue - minValue; // bij mutate_decreasing
     
-	public Individual () {
+	public Individual (int functionType) {
 		values = new double[numDimensions];
 		rnd = new Random();
+		mode = functionType;
 		initialize();
 	}
 	
 	public void initialize(){
+		if (mode == 2) {
+			mutation_stddev = 0.3;
+		} else if (mode == 3) {
+			
+		}
 		//intialiseer de values met random getallen
 		for (int i = 0; i < numDimensions; i++) {
 			values[i] = Math.random() * (maxValue - minValue) + minValue;
@@ -32,14 +40,24 @@ class Individual {
 	}
 
 	public Individual createOffspring (Individual i) {
-		Individual child = new Individual();
-		child.values = mutateNonuniform(crossoverUniform(i.values));
+		Individual child = new Individual(mode);
+		if (mode == 2) {
+			msize_decrease_factor = 0.988;
+			child.values = mutateNonuniform(crossover(i.values));
+		} else if (mode == 1) {
+			msize_decrease_factor = 0.93;
+			child.values = mutateDecreasing(crossover(i.values));
+		} else if (mode == 3) {
+			msize_decrease_factor = 0.95;
+				child.values = mutateDecreasing(crossoverAverage(i.values));
+		}
 		return child;
 	}
 	
 	public Individual createOffspring (Individual i, Individual i2) {
-		Individual child = new Individual();
-		child.values = mutateNonuniform(crossoverThreeParents(i.values, i2.values));
+		Individual child = new Individual(mode);
+		msize_decrease_factor = 0.95;
+		child.values = mutateDecreasing(crossoverThreeParents(i.values, i2.values));
 		return child;
 	}
 	
@@ -50,6 +68,14 @@ class Individual {
 		return c;
 	}
 
+	private double[] crossoverAverage(double[] d) {
+		double[] child = new double[numDimensions];
+		for(int i = 0; i < numDimensions; i++){ 			//ouder 1
+			child[i] = (this.values[i] + d[i])/2;
+		}
+		return child;
+	}
+	
 	private double[] crossover (double[] d) { //one of the parent values
 		int crossoverpoint = randomWithRange(1,numDimensions-1); //bepaald welk stuk van welke ouder
 		double[] child = new double[numDimensions];
@@ -112,8 +138,8 @@ class Individual {
 	private Individual[] crossoverTwoChildren (double[] d) { //one of the parent values
 		int crossoverpoint = randomWithRange(1,8); //bepaald welk stuk van welke ouder
 		Individual[] children = new Individual[2];
-		children[0] = new Individual();
-		children[1] = new Individual();
+		children[0] = new Individual(mode);
+		children[1] = new Individual(mode);
 		for(int i = 0; i < crossoverpoint; i++){ 
 			children[0].values[i] = this.values[i];	//ouder 1
 			children[1].values[i] = d[i];		//ouder 2
@@ -134,6 +160,14 @@ class Individual {
         d[mutationpoint] = Math.random() * (maxValue - minValue) + minValue;
         return d;
     }
+   
+    private double[] mutate2 (double[] d) {    //child values
+        int mutationpoint = randomWithRange(0,numDimensions-1);
+        if (Math.random() < mutationParameter2) {
+        	d[mutationpoint] = Math.random() * (maxValue - minValue) + minValue;
+        }
+        return d;
+    }
     
     private double[] mutateNonuniform (double[] d) {
     	double replacement = 0;
@@ -146,6 +180,9 @@ class Individual {
     		
     		d[i] = replacement;
     	}
+    	
+    	
+    	mutation_stddev *= msize_decrease_factor;
     	
 		return d;
     }
